@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+  
+  <!-- PWA Meta Tags -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Принцесса" />
+  <meta name="theme-color" content="#ff7eb6" />
+  
+  <!-- Иконка (прямая ссылка на фото) -->
+  <link rel="apple-touch-icon" href="https://i.imgur.com/uT8P8bZ.jpeg" />
+  
+  <title>Для моей принцессы 💗</title>
+
+  <style>
+    :root {
+      --pink-50:  #fff5f9;
+      --pink-100: #ffe4ef;
+      --pink-200: #ffc9de;
+      --pink-300: #ff9fc5;
+      --pink-400: #ff7eb6;
+      --pink-500: #ff5c9e;
+      --purple:   #b4267a;
+      --ink:      #5c1a3e;
+      --shadow:   0 10px 30px rgba(180, 38, 122, 0.18);
+
+      --env-w: 300px;
+      --env-h: 190px;
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      min-height: 100dvh;
+      padding: env(safe-area-inset-top) env(safe-area-inset-right)
+               env(safe-area-inset-bottom) env(safe-area-inset-left);
+      background:
+        radial-gradient(circle at 20% 0%, #ffe4ef 0%, transparent 55%),
+        radial-gradient(circle at 100% 100%, #ffc9de 0%, transparent 55%),
+        linear-gradient(160deg, var(--pink-50), #ffe9f3 60%, #ffd6e8);
+      color: var(--ink);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px 16px;
+      gap: 16px;
+      overflow-x: hidden;
+    }
+
+    .hearts {
+      position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 0;
+    }
+    .hearts span {
+      position: absolute;
+      bottom: -40px;
+      opacity: 0;
+      animation: floatUp linear infinite;
+    }
+    
+    @keyframes floatUp {
+      0% { transform: translateY(0) translateX(0) rotate(0deg); opacity: 0; }
+      10% { opacity: 0.7; }
+      90% { opacity: 0.7; }
+      100% { transform: translateY(-110vh) translateX(30px) rotate(360deg); opacity: 0; }
+    }
+
+    .card {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 460px;
+      background: rgba(255, 255, 255, 0.82);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 156, 197, 0.5);
+      border-radius: 28px;
+      padding: 26px 20px 22px;
+      box-shadow: var(--shadow);
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      margin: 0 0 6px;
+      color: var(--purple);
+      letter-spacing: 0.3px;
+    }
+    .subtitle {
+      font-size: 0.95rem;
+      color: #a35a86;
+      margin: 0 0 24px;
+      line-height: 1.5;
+      transition: color 0.3s;
+    }
+    .subtitle.locked {
+      color: #d06a96;
+      font-weight: 600;
+    }
+
+    .scene {
+      position: relative;
+      width: var(--env-w);
+      height: var(--env-h);
+      margin: 0 auto 20px;
+      perspective: 1200px;
+      transition: opacity 0.3s;
+    }
+    .scene.locked .envelope {
+      pointer-events: none;
+      filter: grayscale(40%) opacity(0.8);
+    }
+
+    .letter {
+      position: absolute;
+      left: 50%;
+      bottom: 0;
+      transform: translateX(-50%) translateY(10px);
+      width: calc(var(--env-w) - 40px);
+      min-height: 120px;
+      background:
+        repeating-linear-gradient(
+          180deg,
+          rgba(255, 228, 239, 0.35) 0px,
+          rgba(255, 228, 239, 0.35) 1px,
+          transparent 1px,
+          transparent 28px
+        ),
+        #fff;
+      border: 1px solid var(--pink-200);
+      border-radius: 12px;
+      padding: 16px 14px;
+      box-shadow: 0 10px 25px rgba(180, 38, 122, 0.15);
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--purple);
+      line-height: 1.45;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      z-index: 3;
+      opacity: 0;
+      pointer-events: none;
+      transition: transform .6s cubic-bezier(.34,1.56,.64,1), opacity .35s ease;
+    }
+
+    .scene.open .letter {
+      opacity: 1;
+      transform: translateX(-50%) translateY(calc(-1 * var(--env-h) + 60px)) rotate(-1.5deg);
+    }
+
+    .envelope {
+      position: absolute;
+      inset: 0;
+      cursor: pointer;
+    }
+
+    .env-body {
+      position: absolute;
+      inset: 0;
+      border-radius: 16px;
+      background: linear-gradient(160deg, #ffd9e8 0%, #ffb8d4 100%);
+      border: 1px solid #ffa7c8;
+      overflow: hidden;
+      z-index: 2;
+      filter: drop-shadow(0 12px 22px rgba(180, 38, 122, 0.2));
+    }
+    
+    .env-body::before {
+      content: "";
+      position: absolute;
+      left: 0; right: 0; top: 0; height: 30px;
+      background: linear-gradient(180deg, rgba(180,38,122,.2) 0%, transparent 100%);
+      pointer-events: none;
+    }
+
+    .env-body::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: 
+        linear-gradient(45deg, transparent 48%, rgba(255,255,255,0.3) 50%, transparent 52%),
+        linear-gradient(-45deg, transparent 48%, rgba(255,255,255,0.3) 50%, transparent 52%);
+      pointer-events: none;
+    }
+
+    .env-flap {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 130px;
+      background: linear-gradient(160deg, #ffc9de 0%, #ff9fc5 100%);
+      clip-path: polygon(0 0, 100% 0, 50% 100%);
+      transform-origin: top center;
+      transform: rotateX(0deg);
+      transition: transform .55s cubic-bezier(.22,.9,.3,1.05);
+      border-top-left-radius: 16px;
+      border-top-right-radius: 16px;
+      z-index: 4;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      filter: drop-shadow(0 4px 10px rgba(180, 38, 122, 0.1));
+    }
+
+    .env-flap .seal {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 30%, #ff5c9e, #b4267a);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      box-shadow: 0 4px 10px rgba(180, 38, 122, 0.45), inset 0 -2px 6px rgba(0,0,0,0.15);
+      transform: translateY(60px);
+      transition: opacity .25s ease, transform .25s ease;
+    }
+
+    .scene.open .env-flap {
+      transform: rotateX(180deg);
+      z-index: 1;
+    }
+    .scene.open .env-flap .seal {
+      opacity: 0;
+      transform: translateY(60px) scale(.5);
+    }
+
+    button {
+      width: 100%;
+      padding: 16px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #fff;
+      border: none;
+      border-radius: 18px;
+      background: linear-gradient(135deg, var(--pink-400), var(--purple));
+      box-shadow: 0 8px 20px rgba(180, 38, 122, 0.35);
+      cursor: pointer;
+      transition: transform .12s ease, box-shadow .12s ease, opacity .2s, background 0.3s;
+      -webkit-appearance: none;
+      touch-action: manipulation;
+    }
+    button:active {
+      transform: scale(0.97);
+      box-shadow: 0 4px 12px rgba(180, 38, 122, 0.3);
+    }
+    button:disabled {
+      background: linear-gradient(135deg, #d0b6c4, #9a7088);
+      cursor: not-allowed;
+      box-shadow: none;
+      opacity: 0.8;
+    }
+
+    .hint {
+      font-size: 0.72rem;
+      color: #b8809f;
+      margin-top: 14px;
+      line-height: 1.4;
+      transition: opacity 0.3s;
+    }
+
+    @media (max-width: 380px) {
+      :root { --env-w: 270px; --env-h: 170px; }
+      .env-flap { height: 110px; }
+      .letter { font-size: 0.98rem; padding: 12px 10px; }
+      .env-flap .seal { transform: translateY(50px); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .hearts span { animation: none; display: none; }
+      .letter, .env-flap { transition: none; }
+      button { transition: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="hearts" aria-hidden="true" id="hearts"></div>
+
+  <main class="card">
+    <h1>Для моей принцессы 👑</h1>
+    <p class="subtitle" id="subtitle">Нажми на кнопку — конверт откроется, и письмо само тебя найдёт</p>
+
+    <div class="scene" id="scene">
+      <div class="letter" id="letter" aria-live="polite">
+        Здесь появится признание…
+      </div>
+      
+      <div class="envelope" id="envelope">
+        <div class="env-body" id="envBody" role="button" tabindex="0" aria-label="Открыть конверт"></div>
+        <div class="env-flap" id="envFlap" role="button" tabindex="0" aria-label="Открыть конверт">
+          <div class="seal">💗</div>
+        </div>
+      </div>
+    </div>
+
+    <button type="button" id="genBtn">Получить письмо</button>
+
+    <p class="hint" id="hint">Совет: добавь на экран «Домой» через Safari → Поделиться</p>
+  </main>
+
+  <script>
+  (function () {
+    "use strict";
+
+    // ==========================================
+    // 📱 PWA МАНИФЕСТ (Генерируется на лету)
+    // ==========================================
+    const manifestData = {
+      "name": "Для моей принцессы",
+      "short_name": "Принцесса",
+      "description": "Генератор любовных писем",
+      "start_url": ".",
+      "display": "standalone",
+      "background_color": "#fff5f9",
+      "theme_color": "#ff7eb6",
+      "orientation": "portrait",
+      "icons": [
+        {
+          "src": "https://i.imgur.com/uT8P8bZ.jpeg",
+          "sizes": "180x180",
+          "type": "image/jpeg",
+          "purpose": "any maskable"
+        }
+      ]
+    };
+
+    const manifestBlob = new Blob([JSON.stringify(manifestData)], { type: 'application/json' });
+    const manifestURL = URL.createObjectURL(manifestBlob);
+    const link = document.createElement('link');
+    link.rel = 'manifest';
+    link.href = manifestURL;
+    document.head.appendChild(link);
+
+    // ==========================================
+    // 🎵 АУДИО-ДВИЖОК (Web Audio API)
+    // ==========================================
+    let audioCtx = null;
+
+    function initAudio() {
+      if (!audioCtx) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (AudioContext) {
+          audioCtx = new AudioContext();
+        }
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playPaperSound() {
+      if (!audioCtx) return;
+      const duration = 0.3;
+      const bufferSize = audioCtx.sampleRate * duration;
+      const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+      const data = buffer.getChannelData(0);
+      
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = Math.random() * 2 - 1;
+      }
+      
+      const noiseNode = audioCtx.createBufferSource();
+      noiseNode.buffer = buffer;
+      
+      const filter = audioCtx.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.frequency.value = 1000;
+      filter.Q.value = 1.5;
+      
+      const gainNode = audioCtx.createGain();
+      gainNode.gain.setValueAtTime(0.15, audioCtx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+      
+      noiseNode.connect(filter);
+      filter.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+      
+      noiseNode.start();
+    }
+
+    function playChimeSound() {
+      if (!audioCtx) return;
+      const notes = [523.25, 659.25, 783.99];
+      
+      notes.forEach((freq, index) => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        
+        osc.type = 'sine';
+        osc.frequency.value = freq;
+        
+        const startTime = audioCtx.currentTime + (index * 0.08);
+        
+        gain.gain.setValueAtTime(0, startTime);
+        gain.gain.linearRampToValueAtTime(0.08, startTime + 0.05);
+        gain.gain.exponentialRampToValueAtTime(0.001, startTime + 1.2);
+        
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        
+        osc.start(startTime);
+        osc.stop(startTime + 1.2);
+      });
+    }
+
+    // ==========================================
+    // 📜 ФРАЗЫ (Очищены от дубликатов)
+    // ==========================================
+    const LINES = [
+      "С тех пор как мы увиделись, я до сих пор под впечатлением.",
+      "Две встречи с тобой стоят тысячи обычных дней.",
+      "Я до сих пор прокручиваю в голове нашу первую встречу.",
+      "Мне кажется, я запомнил каждую деталь нашей второй встречи.",
+      "Я часто вспоминаю твой взгляд в тот день.",
+      "Наши встречи были короткими, но я думаю о них постоянно.",
+      "Ты оставила в моей памяти след, который не стирается.",
+      "После наших встреч я еще долго хожу вдохновленный.",
+      "Я бы отдал многое, чтобы повторить тот момент.",
+      "Время с тобой пролетает незаметно.",
+      "Я до сих пор чувствую тепло от нашей встречи.",
+      "Каждая минута с тобой — на вес золота.",
+      "Я вспоминаю твой голос, когда мы виделись.",
+      "Мне очень понравилось, как ты улыбалась при встрече.",
+      "Воспоминания о тебе согревают меня в холодные дни.",
+      "Ты — причина, по которой я улыбаюсь своим мыслям.",
+      "Хочу, чтобы этих встреч стало больше.",
+      "Я до сих пор жалею, что наши встречи были такими короткими.",
+      "С тобой даже короткая встреча кажется праздником.",
+      "Я запомнил твой смех с нашей последней встречи.",
+      "Мне хочется запечатлеть каждое мгновение с тобой.",
+      "Наши встречи — лучшие моменты моей жизни.",
+      "Расстояние — это ерунда, когда есть тот, кого хочется видеть.",
+      "Я бы преодолел любые километры, чтобы просто обнять тебя.",
+      "Мне тебя не хватает, даже если это всего лишь расстояние.",
+      "Как жаль, что мы не можем просто встретиться и погулять.",
+      "Я скучаю по твоему голосу и взгляду.",
+      "Хочу, чтобы расстояние между нами стало меньше.",
+      "Расстояние делает сердце только теплее.",
+      "Я думаю о тебе, даже когда между нами города.",
+      "Очень жду нашей следующей встречи.",
+      "Каждый день без тебя — как маленькая вечность.",
+      "Я бы все отдал за еще одну прогулку с тобой.",
+      "Расстояние не мешает мне думать о тебе.",
+      "Мне не хватает твоего присутствия рядом.",
+      "Хочу снова услышать твой голос вживую.",
+      "Надеюсь, мы скоро увидимся.",
+      "Ты далеко, но в моих мыслях ты всегда рядом.",
+      "Расстояние — это проверка, которую мы пройдем.",
+      "Я скучаю по твоей улыбке.",
+      "Мне хочется, чтобы ты была ближе.",
+      "Даже километры не могут уменьшить мою симпатию к тебе.",
+      "Жду не дождусь, когда снова тебя увижу.",
+      "Ты — мой лучший повод для поездки.",
+      "Хочу, чтобы следующая встреча случилась как можно скорее.",
+      "Мне не хватает наших разговоров.",
+      "Я бы хотел, чтобы расстояние было просто цифрой в навигаторе.",
+      "Скучаю по твоему смеху.",
+      "Ты в моем сердце, несмотря на расстояние.",
+      "Каждый раз, когда вижу твои фото, хочу быть рядом.",
+      "Мне хочется сократить это расстояние до нуля.",
+      "Я очень жду момента, когда мы снова встретимся.",
+      "Ты невероятно красива.",
+      "У тебя потрясающая внешность.",
+      "Ты выглядишь как произведение искусства.",
+      "Твоя улыбка — это что-то невероятное.",
+      "У тебя самые красивые глаза на свете.",
+      "Мне очень нравится твой стиль.",
+      "Ты очень милая.",
+      "Твоя естественность — твое главное украшение.",
+      "У тебя отличное чувство юмора, я это заметил.",
+      "Ты очень умна и интересна.",
+      "С тобой легко и приятно общаться.",
+      "Ты обладаешь невероятной притягательностью.",
+      "Мне нравится твоя манера общаться.",
+      "Ты очень обаятельная.",
+      "У тебя красивая душа.",
+      "Твои глаза светятся добротой.",
+      "Мне нравится, как ты смотришь на мир.",
+      "Ты умеешь производить впечатление.",
+      "Твоя энергетика меня привлекает.",
+      "Ты — само очарование.",
+      "Мне нравится твой вкус.",
+      "Ты очень стильная.",
+      "У тебя отличная фигура.",
+      "Ты выглядишь потрясающе в любой одежде.",
+      "Твой смех заразителен.",
+      "Мне нравится твоя искренность.",
+      "Ты очень нежная.",
+      "В тебе есть какая-то загадка.",
+      "Мне нравится твоя уверенность.",
+      "Ты очень женственная.",
+      "Ты умеешь быть разной, и это круто.",
+      "Мне нравится твой голос.",
+      "Ты очень светлый человек.",
+      "С тобой хочется общаться снова и снова.",
+      "Мне нравится твоя открытость.",
+      "Ты очень интересный собеседник.",
+      "У тебя красивая улыбка, которая сводит с ума.",
+      "Ты — воплощение очарования.",
+      "Мне нравится твоя непосредственность.",
+      "Ты очень милая, когда смущаешься.",
+      "Я восхищаюсь твоей целеустремленностью.",
+      "Мне нравится твоя доброта.",
+      "Ты умеешь быть заботливой.",
+      "С тобой тепло даже на расстоянии.",
+      "Мне нравится твоя индивидуальность.",
+      "Ты не похожа на других.",
+      "Ты — особенная.",
+      "Мне нравится твой взгляд.",
+      "Ты привлекаешь внимание.",
+      "У тебя отличная аура.",
+      "Я заметил, что ты очень хороший человек.",
+      "Я бы украл тебя, если бы мог.",
+      "Ты явно создана для того, чтобы сводить меня с ума.",
+      "Мне кажется, я попал под твое обаяние.",
+      "Ты играешь с моими мыслями.",
+      "Ты производишь неизгладимое впечатление.",
+      "Я готов ждать нашей встречи сколько угодно.",
+      "Ты — моя самая приятная неожиданность.",
+      "Ты — причина моего хорошего настроения.",
+      "Я бы хотел украсть твое время.",
+      "Ты вскружила мне голову.",
+      "Я готов на многое ради еще одной встречи с тобой.",
+      "Ты — та, о ком я думаю перед сном.",
+      "Мне нравится эта игра взглядов.",
+      "Ты меня заинтриговала.",
+      "Ты — мой личный магнит.",
+      "Я чувствую притяжение к тебе.",
+      "Ты — та самая муза.",
+      "Я бы посвятил тебе стихи.",
+      "Ты — мой источник вдохновения.",
+      "Мне нравится о тебе думать.",
+      "Ты занимаешь все мои мысли.",
+      "Я бы хотел, чтобы ты была рядом.",
+      "Ты — мой сладкий запретный плод.",
+      "Ты — мой идеал.",
+      "Я ищу в тебе все больше хорошего.",
+      "Мне кажется, мы могли бы быть счастливы.",
+      "Ты — та, с кем хочется разделить радость.",
+      "Ты — мой человек.",
+      "Ты мне очень нравишься.",
+      "Ты — мой самый интересный собеседник.",
+      "Я готов слушать тебя часами.",
+      "Ты — мой лучший друг.",
+      "Ты — та, кому я доверяю.",
+      "Мне легко с тобой.",
+      "Ты — мой комфортный человек.",
+      "С тобой я чувствую себя собой.",
+      "Ты заставляешь мое сердце биться быстрее.",
+      "Каждый раз, когда вижу уведомление от тебя, я радуюсь.",
+      "Мне очень хорошо с тобой.",
+      "Ты делаешь мой мир ярче.",
+      "Ты — мой лучик света.",
+      "Я хочу, чтобы ты была счастлива.",
+      "Ты заслуживаешь всего самого лучшего.",
+      "Мне нравится заботиться о тебе.",
+      "Ты — мое самое теплое чувство.",
+      "Мне хочется сделать для тебя что-то приятное.",
+      "Ты — мой самый дорогой человек.",
+      "Я очень рад, что встретил тебя.",
+      "Ты — моя самая большая удача.",
+      "С тобой я чувствую себя счастливым.",
+      "Ты — причина моей улыбки.",
+      "Мне нравится думать о тебе.",
+      "Ты — мой самый лучший сон.",
+      "Хочу, чтобы ты стала частью моей жизни.",
+      "Ты — то, чего я так долго искал.",
+      "Мне кажется, я влюбляюсь.",
+      "Ты разбудила во мне новые чувства.",
+      "Мое сердце принадлежит тебе.",
+      "Ты — моя любовь с первого взгляда.",
+      "Спасибо, что ты есть.",
+      "Ты — мой подарок судьбы.",
+      "Я не могу перестать думать о тебе.",
+      "Ты — мой сладкий сон.",
+      "С тобой я чувствую себя живым.",
+      "Ты — мой самый главный человек.",
+      "Я готов отдать тебе последнюю конфету.",
+      "Ты сводишь меня с ума, и мне это нравится.",
+      "Я готов на все ради твоей улыбки.",
+      "Ты — мой личный герой.",
+      "Я готов бороться за твое внимание.",
+      "Ты — моя самая большая слабость.",
+      "Я бы украл для тебя звезду с неба.",
+      "Мне нравится, как ты меня дразнишь.",
+      "Ты — мой личный источник вдохновения.",
+      "Я бы прошел с тобой через любые пробки.",
+      "Даже очередь с тобой — приключение.",
+      "Ты умеешь поднять мне настроение.",
+      "Ты — мой лучший антидепрессант.",
+      "Я улыбаюсь, когда думаю о тебе.",
+      "Ты — моя самая любимая привычка.",
+      "Мне нравится твой характер.",
+      "Ты — тот человек, с кем можно дурачиться.",
+      "Ты — мой самый близкий друг.",
+      "Я готов на все ради нашей встречи.",
+      "Ты — мой человек.",
+      "Я выбираю тебя.",
+      "Спасибо, что выбрала меня.",
+      "Ты — мое самое дорогое сокровище."
+    ];
+
+    const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+
+    const scene    = document.getElementById("scene");
+    const letterEl = document.getElementById("letter");
+    const envBody  = document.getElementById("envBody");
+    const envFlap  = document.getElementById("envFlap");
+    const genBtn   = document.getElementById("genBtn");
+    const subtitle = document.getElementById("subtitle");
+
+    const STORAGE_DATE = "love_letter_date";
+    const STORAGE_COUNT = "love_letter_count";
+
+    function getMoscowDate() {
+      const now = new Date();
+      const mskTime = new Date(now.getTime() + (now.getTimezoneOffset() * 60000) + (3 * 3600000));
+      return mskTime.toISOString().split('T')[0];
+    }
+
+    function getMoscowHour() {
+      const now = new Date();
+      const mskTime = new Date(now.getTime() + (now.getTimezoneOffset() * 60000) + (3 * 3600000));
+      return mskTime.getHours();
+    }
+
+    function checkLimit() {
+      const today = getMoscowDate();
+      const hour = getMoscowHour();
+      
+      let savedDate = localStorage.getItem(STORAGE_DATE);
+      let savedCount = parseInt(localStorage.getItem(STORAGE_COUNT) || "0", 10);
+
+      if (savedDate !== today) {
+        savedDate = today;
+        savedCount = 0;
+        localStorage.setItem(STORAGE_DATE, savedDate);
+        localStorage.setItem(STORAGE_COUNT, savedCount);
+      }
+
+      if (hour >= 8 && hour < 23) {
+        if (savedCount >= 1) {
+          return { allowed: false, msg: "Утреннее письмо уже получено. Возвращайся за вторым после 23:00 💤" };
+        }
+        return { allowed: true, count: savedCount };
+      } else {
+        if (savedCount >= 2) {
+          return { allowed: false, msg: "На сегодня лимит исчерпан, моя принцесса. Жду тебя завтра после 8:00 🌅" };
+        }
+        return { allowed: true, count: savedCount };
+      }
+    }
+
+    function updateUI() {
+      const status = checkLimit();
+      
+      if (!status.allowed) {
+        genBtn.disabled = true;
+        genBtn.textContent = "Письмо уже получено";
+        subtitle.textContent = status.msg;
+        subtitle.classList.add("locked");
+        scene.classList.add("locked");
+        scene.classList.remove("open");
+      } else {
+        genBtn.disabled = false;
+        genBtn.textContent = "Получить письмо";
+        subtitle.textContent = "Нажми на кнопку — конверт откроется, и письмо само тебя найдёт";
+        subtitle.classList.remove("locked");
+        scene.classList.remove("locked");
+      }
+    }
+
+    let current = "";
+    let busy = false;
+
+    function pickLine() {
+      let raw = pick(LINES);
+      let guard = 0;
+      while (raw === current && guard++ < 10) raw = pick(LINES);
+      current = raw;
+      return raw;
+    }
+
+    function receiveLetter() {
+      if (busy) return;
+      
+      initAudio();
+
+      const status = checkLimit();
+      if (!status.allowed) {
+        updateUI();
+        return;
+      }
+
+      busy = true;
+      const newCount = status.count + 1;
+      localStorage.setItem(STORAGE_COUNT, newCount);
+
+      if (scene.classList.contains("open")) {
+        scene.classList.remove("open");
+        setTimeout(() => {
+          letterEl.textContent = pickLine();
+          scene.classList.add("open");
+          
+          playPaperSound();
+          setTimeout(playChimeSound, 400);
+
+          busy = false;
+          updateUI();
+        }, 400);
+      } else {
+        letterEl.textContent = pickLine();
+        setTimeout(() => {
+          scene.classList.add("open");
+          
+          playPaperSound();
+          setTimeout(playChimeSound, 400);
+
+          busy = false;
+          updateUI();
+        }, 60);
+      }
+    }
+
+    genBtn.addEventListener("click", receiveLetter);
+
+    const toggleEnvelope = () => {
+      if (!checkLimit().allowed) return;
+      
+      if (scene.classList.contains("open")) {
+        scene.classList.remove("open");
+      } else {
+        receiveLetter();
+      }
+    };
+
+    envBody.addEventListener("click", toggleEnvelope);
+    envFlap.addEventListener("click", toggleEnvelope);
+
+    setInterval(updateUI, 60000);
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") updateUI();
+    });
+
+    (function hearts() {
+      const box = document.getElementById("hearts");
+      
+      const colors = [
+        "#ff7eb6", "#ffc9de", "#b4267a", "#ff9fc5", "#ffb8d4",
+        "#ff5c9e", "#ffd6e8", "#d36ca3", "#ff9a9e", "#fecfef"
+      ];
+      
+      const emojis = ["💖", "💕", "💗", "🌸", "💞", "🩷", "💓", "💘"];
+      const N = 45;
+
+      for (let i = 0; i < N; i++) {
+        const s = document.createElement("span");
+        s.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+        s.style.color = colors[Math.floor(Math.random() * colors.length)];
+        s.style.left = (Math.random() * 100).toFixed(1) + "%";
+        s.style.fontSize = (14 + Math.random() * 24).toFixed(0) + "px";
+        s.style.animationDuration = (8 + Math.random() * 14).toFixed(1) + "s";
+        s.style.animationDelay = (-Math.random() * 20).toFixed(1) + "s";
+        s.style.textShadow = "0 2px 5px rgba(180, 38, 122, 0.2)";
+        box.appendChild(s);
+      }
+    })();
+
+    letterEl.textContent = "Здесь появится признание…";
+    updateUI();
+  })();
+  </script>
+</body>
+</html>
