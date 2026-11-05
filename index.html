@@ -7,11 +7,11 @@
   <!-- PWA Meta Tags -->
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <meta name="apple-mobile-web-app-title" content="Принцесса" />
+  <meta name="apple-mobile-web-app-title" content="Письмо" />
   <meta name="theme-color" content="#ff7eb6" />
   
-  <!-- Иконка (прямая ссылка на фото) -->
-  <link rel="apple-touch-icon" href="https://i.imgur.com/uT8P8bZ.jpeg" />
+  <!-- Иконка: Красивый градиент с конвертом и сердечком -->
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23ff9fc5'/%3E%3Cstop offset='100%25' stop-color='%23b4267a'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='180' height='180' rx='40' fill='url(%23g)'/%3E%3Ctext x='90' y='125' font-size='85' text-anchor='middle'%3E💌%3C/text%3E%3C/svg%3E" />
   
   <title>Для моей принцессы 💗</title>
 
@@ -322,7 +322,7 @@
     // ==========================================
     const manifestData = {
       "name": "Для моей принцессы",
-      "short_name": "Принцесса",
+      "short_name": "Письмо",
       "description": "Генератор любовных писем",
       "start_url": ".",
       "display": "standalone",
@@ -331,9 +331,9 @@
       "orientation": "portrait",
       "icons": [
         {
-          "src": "https://i.imgur.com/uT8P8bZ.jpeg",
+          "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23ff9fc5'/%3E%3Cstop offset='100%25' stop-color='%23b4267a'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='180' height='180' rx='40' fill='url(%23g)'/%3E%3Ctext x='90' y='125' font-size='85' text-anchor='middle'%3E💌%3C/text%3E%3C/svg%3E",
           "sizes": "180x180",
-          "type": "image/jpeg",
+          "type": "image/svg+xml",
           "purpose": "any maskable"
         }
       ]
@@ -757,7 +757,7 @@
       if (document.visibilityState === "visible") updateUI();
     });
 
-    (function hearts() {
+        (function hearts() {
       const box = document.getElementById("hearts");
       
       const colors = [
